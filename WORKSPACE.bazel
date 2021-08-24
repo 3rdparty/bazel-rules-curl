@@ -1,0 +1,21 @@
+
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+# Rule repository, note that it's recommended to use a pinned commit to a released version of the rules
+http_archive(
+    name = "rules_foreign_cc",
+    url = "https://github.com/bazelbuild/rules_foreign_cc/archive/0.5.1.tar.gz",
+    sha256 = "33a5690733c5cc2ede39cb62ebf89e751f2448e27f20c8b2fbbc7d136b166804",
+    strip_prefix = "rules_foreign_cc-0.5.1",
+)
+
+load("@rules_foreign_cc//foreign_cc:repositories.bzl", "rules_foreign_cc_dependencies")
+rules_foreign_cc_dependencies()
+
+http_archive(
+    name = "libcurl",
+    build_file = "//:BUILD.bazel",
+    strip_prefix = "curl-curl-7_78_0",
+    sha256 = "ffa8f79f68dd77b08987ce16acd1f292875df8ab3bf7e3654f98d62b445ebd9a",
+    url = "https://github.com/curl/curl/archive/refs/tags/curl-7_78_0.tar.gz",
+)
