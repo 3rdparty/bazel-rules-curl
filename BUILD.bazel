@@ -11,14 +11,21 @@ cmake(
     cache_entries = {
         "CMAKE_BUILD_TYPE": "Release",
         "BUILD_SHARED_LIBS": "OFF",
+        "BUILD_TESTING": "OFF",
         "CMAKE_USE_OPENSSL": "false",
     },
     lib_source = "@libcurl//:all",
     out_static_libs = select({
         "@bazel_tools//src/conditions:windows": [
-            "Release/libcurl.lib",
+            "libcurl.lib",
         ],
         "//conditions:default": ["libcurl.a"],
     }),
-    linkopts = ["-ldl",],
+    linkopts = select({
+        "@bazel_tools//src/conditions:windows": [],
+        "@bazel_tools//src/conditions:darwin": [],
+        "//conditions:default": [
+            "-ldl",
+        ],
+    }),
 )
