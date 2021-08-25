@@ -25,7 +25,7 @@ cmake(
         "@bazel_tools//src/conditions:windows": [],
         "@bazel_tools//src/conditions:darwin": [],
         "//conditions:default": [
-            "-ldl",
+            "-ldl", "-lzl",
         ],
     }),
 )
