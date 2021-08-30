@@ -12,9 +12,10 @@ cmake(
         "CMAKE_BUILD_TYPE": "Release",
         "BUILD_SHARED_LIBS": "OFF",
         "BUILD_TESTING": "OFF",
-        "CMAKE_USE_OPENSSL": "false",
+        "CMAKE_USE_OPENSSL": "FALSE",
+        "CURL_DISABLE_LDAP" : "TRUE",
     },
-    lib_source = "@libcurl//:all",
+    lib_source = "//:all",
     out_static_libs = select({
         "@bazel_tools//src/conditions:windows": [
             "libcurl.lib",
@@ -22,10 +23,17 @@ cmake(
         "//conditions:default": ["libcurl.a"],
     }),
     linkopts = select({
-        "@bazel_tools//src/conditions:windows": [],
+        "@bazel_tools//src/conditions:windows": [
+            "WS2_32.Lib",
+            "Advapi32.lib",
+            "Iphlpapi.lib",
+            "Userenv.lib",
+            "User32.lib",
+        ],
         "@bazel_tools//src/conditions:darwin": [],
         "//conditions:default": [
             "-ldl", "-lz",
         ],
     }),
+    visibility = ["//visibility:public"],
 )
