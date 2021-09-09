@@ -34,7 +34,7 @@ def deps():
     curl_deps()
 ```
 
-4. You can then use `@com_github_curl_curl` in your target's `deps`.
+4. You can then use `@com_github_curl_curl//:libcurl` in your target's `deps`.
 
 5. Repeat the steps starting at (1) at the desired version of this repository that you want to use:
 
