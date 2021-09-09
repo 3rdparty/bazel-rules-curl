@@ -24,7 +24,9 @@ def repos(external = True, repo_mapping = {}):
         repo_mapping = repo_mapping,
     )
 
-    openssl_repos()
+    openssl_repos(
+        repo_mapping = repo_mapping,
+    )
 
     if external:
         maybe(

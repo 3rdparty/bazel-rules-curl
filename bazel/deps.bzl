@@ -8,7 +8,9 @@ load("@com_github_3rdparty_bazel_rules_openssl//bazel:deps.bzl", openssl_deps="d
 def deps(repo_mapping = {}):
     rules_foreign_cc_dependencies()
 
-    openssl_deps()
+    openssl_deps(
+        repo_mapping = repo_mapping,
+    )
 
     maybe(
         http_archive,
