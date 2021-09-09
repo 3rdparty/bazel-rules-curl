@@ -21,6 +21,7 @@ def repos(external = True, repo_mapping = {}):
         url = "https://github.com/bazelbuild/rules_foreign_cc/archive/0.5.1.tar.gz",
         sha256 = "33a5690733c5cc2ede39cb62ebf89e751f2448e27f20c8b2fbbc7d136b166804",
         strip_prefix = "rules_foreign_cc-0.5.1",
+        repo_mapping = repo_mapping,
     )
 
     openssl_repos()
@@ -30,5 +31,7 @@ def repos(external = True, repo_mapping = {}):
             git_repository,
             name = "com_github_3rdparty_bazel_rules_libcurl",
             remote = "https://github.com/3rdparty/bazel-rules-libcurl",
-            branch = "main",
+            commit = "",
+            shallow_since = "",
+            repo_mapping = repo_mapping,
         )
