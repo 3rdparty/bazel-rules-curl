@@ -18,6 +18,6 @@ def deps(repo_mapping = {}):
         url = "https://github.com/curl/curl/archive/refs/tags/curl-7_78_0.tar.gz",
         sha256 = "ffa8f79f68dd77b08987ce16acd1f292875df8ab3bf7e3654f98d62b445ebd9a",
         strip_prefix = "curl-curl-7_78_0",
-        build_file = "@com_github_3rdparty_bazel_rules_libcurl//:BUILD.bazel",
+        build_file = "@com_github_3rdparty_bazel_rules_curl//:BUILD.bazel",
         repo_mapping = repo_mapping,
     )
