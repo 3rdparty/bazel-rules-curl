@@ -40,4 +40,4 @@ def deps():
 
 | curl | Copy `bazel/repos.bzl` from: |
 | :---: | :--------------------------: |
-| 7.78.0 | [387662e](https://github.com/3rdparty/bazel-rules-curl/tree/387662e9df47d9e7e4db5fb95d154972cf9a7cf0) |
+| 7.78.0 | [7cf883b](https://github.com/3rdparty/bazel-rules-curl/tree/7cf883b56673808156d5d986818017901108e8d7) |
