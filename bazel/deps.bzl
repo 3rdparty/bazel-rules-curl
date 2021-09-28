@@ -1,14 +1,19 @@
 """Dependency specific initialization."""
 
+load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
 load("@rules_foreign_cc//foreign_cc:repositories.bzl", "rules_foreign_cc_dependencies")
-load("@com_github_3rdparty_bazel_rules_openssl//bazel:deps.bzl", openssl_deps="deps")
 
 def deps(repo_mapping = {}):
     rules_foreign_cc_dependencies()
 
-    openssl_deps(
+    maybe(
+        git_repository,
+        name = "boringssl",
+        commit = "fc44652a42b396e1645d5e72aba053349992136a",
+        remote = "https://boringssl.googlesource.com/boringssl",
+        shallow_since = "1627579704 +0000",
         repo_mapping = repo_mapping,
     )
 
