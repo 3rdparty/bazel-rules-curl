@@ -6,80 +6,30 @@ filegroup(
     visibility = ["//visibility:public"],
 )
 
-cache_entries_common = {
-    "BUILD_SHARED_LIBS": "OFF",
-    "BUILD_TESTING": "OFF",
-    "BUILD_CURL_EXE": "OFF",
-    "CMAKE_BUILD_TYPE": "Release",
-    # NOTE: Disable unused dependencies so we won't have any linker issues.
-    # At least on MacOS if libssh or libssh2 happens to be installed then
-    # cmake will attempt to link against the library but Bazel will expect
-    # all the symbols to be available and then the binary will crash
-    # when it attempts to dynamically find the symbols at runtime.
-    "CMAKE_USE_LIBSSH": "FALSE",
-    "CMAKE_USE_LIBSSH2": "FALSE",
-    "CMAKE_USE_BEARSSL": "FALSE",
-    "CMAKE_USE_WOLFSSL": "FALSE",
-    "CMAKE_USE_MBEDTLS": "FALSE",
-    "CMAKE_USE_NSS": "FALSE",
-}
-
-# NOTE: Use basic libcurl without support for SSL on Windows
-# because we currently can't reliably compile either OpenSSL or
-# boringssl on that platform (see stout-eventuals/#59).
-alias(
-    name = "libcurl",
-    actual = select({
-        "@bazel_tools//src/conditions:windows": "libcurl_nossl",
-        "//conditions:default": "libcurl_boringssl",
-    }),
-    visibility = ["//visibility:public"],
-)
-
 cmake(
-    name = "libcurl_nossl",
-    cache_entries = dict(cache_entries_common.items() + {
-        "CMAKE_USE_OPENSSL": "FALSE",
-    }.items()),
-    defines = select({
-        "@bazel_tools//src/conditions:windows": ["CURL_STATICLIB"],
-        "//conditions:default": [],
-    }),
-    lib_source = "//:all",
-    linkopts = select({
-        "@bazel_tools//src/conditions:windows": [
-            "WS2_32.Lib",
-            "Advapi32.lib",
-            "Iphlpapi.lib",
-            "Userenv.lib",
-            "User32.lib",
-            "Wldap32.lib",
-        ],
-        "@bazel_tools//src/conditions:darwin": [],
-        "//conditions:default": [
-            # NOTE: We are relying on user-installed libdl and zlib
-            "-ldl",
-            "-lz",
-        ],
-    }),
-    out_static_libs = select({
-        "//conditions:default": ["libcurl.a"],
-        "@bazel_tools//src/conditions:windows": [
-            "libcurl.lib",
-        ],
-    }),
-    visibility = ["//visibility:private"],
-)
-
-cmake(
-    name = "libcurl_boringssl",
-    cache_entries = dict(cache_entries_common.items() + {
+    name = "libcurl_boringssl_build",
+    cache_entries = {
+        "BUILD_SHARED_LIBS": "OFF",
+        "BUILD_TESTING": "OFF",
+        "BUILD_CURL_EXE": "OFF",
+        "CMAKE_BUILD_TYPE": "Release",
         "CMAKE_USE_OPENSSL": "TRUE",
-    }.items()),
-    defines = select({
-        "@bazel_tools//src/conditions:windows": ["CURL_STATICLIB"],
-        "//conditions:default": [],
-    }),
+        "OPENSSL_ROOT_DIR": "$$EXT_BUILD_DEPS$$/../../boringssl",
+        # NOTE: Disable unused dependencies so we won't have any linker issues.
+        # At least on MacOS if libssh or libssh2 happens to be installed then
+        # cmake will attempt to link against the library but Bazel will expect
+        # all the symbols to be available and then the binary will crash
+        # when it attempts to dynamically find the symbols at runtime.
+        "CMAKE_USE_LIBSSH": "FALSE",
+        "CMAKE_USE_LIBSSH2": "FALSE",
+        "CMAKE_USE_BEARSSL": "FALSE",
+        "CMAKE_USE_WOLFSSL": "FALSE",
+        "CMAKE_USE_MBEDTLS": "FALSE",
+        "CMAKE_USE_NSS": "FALSE",
+    },
+    defines = [
+        "CURL_STATICLIB",
+    ],
     lib_source = "//:all",
     linkopts = select({
         "@bazel_tools//src/conditions:windows": [
@@ -89,6 +39,7 @@ cmake(
             "Userenv.lib",
             "User32.lib",
             "Wldap32.lib",
+            "Crypt32.lib",
         ],
         "@bazel_tools//src/conditions:darwin": [],
         "//conditions:default": [
@@ -105,6 +56,17 @@ cmake(
     }),
     visibility = ["//visibility:private"],
     deps = [
+        # NOTE: bssl has crypto and ssl rules as deps
+        # but as it's a cc_binary rule they are not propagated.
+        "@boringssl//:bssl",
+    ],
+)
+
+cc_library(
+    name = "libcurl_boringssl",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//:libcurl_boringssl_build",
         "@boringssl//:crypto",
         "@boringssl//:ssl",
     ],

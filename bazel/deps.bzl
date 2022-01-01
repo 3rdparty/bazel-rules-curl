@@ -11,9 +11,9 @@ def deps(repo_mapping = {}):
     maybe(
         git_repository,
         name = "boringssl",
-        commit = "fc44652a42b396e1645d5e72aba053349992136a",
+        commit = "b9232f9e27e5668bc0414879dcdedb2a59ea75f2",
         remote = "https://boringssl.googlesource.com/boringssl",
-        shallow_since = "1627579704 +0000",
+        shallow_since = "1637714942 +0000",
         repo_mapping = repo_mapping,
     )
 
