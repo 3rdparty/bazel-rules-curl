@@ -20,54 +20,12 @@ filegroup(
     visibility = ["@com_github_curl_curl//:__pkg__"],
 )
 
-# Builds and outputs crypto and ssl static libs (.lib or .a).
-# Doesn't output headers of those rules!!!
-filegroup(
-    name = "boringssl_built_libs",
-    srcs = [
-        "@boringssl//:crypto",
-        "@boringssl//:ssl",
-    ],
-    visibility = ["//visibility:private"],
-)
-
-# Copies all of the header files of "@boringssl//:crypto" and
-# "@boringssl//:ssl" rules to 'boringssl_includes' rule.
-# We have to use that rule since 'boringssl_built_libs' rule
-# doesn't do it by itself.
-# TODO(folming): symlinking instead of copying (no idea if it works).
-genrule(
-    name = "boringssl_includes_genrule",
-    srcs = ["@boringssl_with_bazel_rules_curl_build_file//:all"],
-    outs = ["boringssl_includes"],
-    cmd = """
-    cp -r "external/boringssl_with_bazel_rules_curl_build_file/src/include" $(OUTS)
-    """,
-    visibility = ["//visibility:private"],
-)
-
-# Used as a dependency for libcurl.
-# Passes built static libs and required includes to other targets
-# that use it as a dependency.
-# It will never build shared boringssl libraries even if dependant targets
-# would ask for it.
-cc_library(
-    name = "boringssl_lib",
-    srcs = [
-        "//:boringssl_built_libs",
-    ],
-    hdrs = [
-        "//:boringssl_includes",
-    ],
-    linkstatic = True,
-    visibility = ["//visibility:private"],
-)
-
 libcurl_boringssl_cache_entries_common = {
     "BUILD_SHARED_LIBS": "OFF",
     "BUILD_TESTING": "OFF",
     "BUILD_CURL_EXE": "OFF",
     "CMAKE_USE_OPENSSL": "TRUE",
+    "OPENSSL_ROOT_DIR": "$EXT_BUILD_DEPS",
     # NOTE: Disable unused dependencies so we won't have any linker issues.
     # At least on MacOS if libssh or libssh2 happens to be installed then
     # cmake will attempt to link against the library but Bazel will expect
@@ -93,9 +51,7 @@ libcurl_defines = [
 # For additional information see comments above.
 cmake(
     name = "libcurl_boringssl_windows",
-    cache_entries = dict(libcurl_boringssl_cache_entries_common.items() + {
-        "OPENSSL_ROOT_DIR": "$$EXT_BUILD_DEPS$$/../../boringssl",
-    }.items()),
+    cache_entries = libcurl_boringssl_cache_entries_common,
     defines = libcurl_defines,
     lib_source = "//:all",
     linkopts = [
@@ -117,7 +73,8 @@ cmake(
     }),
     visibility = ["//visibility:private"],
     deps = [
-        "//:boringssl_lib",
+        "@boringssl//:crypto",
+        "@boringssl//:ssl",
     ],
 )
 
