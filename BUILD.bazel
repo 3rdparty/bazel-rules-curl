@@ -1,11 +1,3 @@
-# NOTE: cmake rule tries to build both shared and static libraries
-# even though the result library is static.
-# Because Windows shared libraries work a bit different
-# from how they work on Linux or MacOS (there's no such a thing as
-# dividing shared libraries into interface and implementation libs).
-# we build static libraries by ourselves and pass output (and includes)
-# as deps to the cmake rule.
-
 load("@rules_foreign_cc//foreign_cc:defs.bzl", "cmake")
 
 filegroup(
@@ -18,49 +10,6 @@ filegroup(
     # we can provide the needed visibility to targets in here but not to any
     # other packages.
     visibility = ["@com_github_curl_curl//:__pkg__"],
-)
-
-# Builds and outputs crypto and ssl static libs (.lib or .a).
-# Doesn't output headers of those rules!!!
-filegroup(
-    name = "boringssl_built_libs",
-    srcs = [
-        "@boringssl//:crypto",
-        "@boringssl//:ssl",
-    ],
-    visibility = ["//visibility:private"],
-)
-
-# Copies all of the header files of "@boringssl//:crypto" and
-# "@boringssl//:ssl" rules to 'boringssl_includes' rule.
-# We have to use that rule since 'boringssl_built_libs' rule
-# doesn't do it by itself.
-# TODO(folming): symlinking instead of copying (no idea if it works).
-genrule(
-    name = "boringssl_includes_genrule",
-    srcs = ["@boringssl_with_bazel_rules_curl_build_file//:all"],
-    outs = ["boringssl_includes"],
-    cmd = """
-    cp -r "external/boringssl_with_bazel_rules_curl_build_file/src/include" $(OUTS)
-    """,
-    visibility = ["//visibility:private"],
-)
-
-# Used as a dependency for libcurl.
-# Passes built static libs and required includes to other targets
-# that use it as a dependency.
-# It will never build shared boringssl libraries even if dependant targets
-# would ask for it.
-cc_library(
-    name = "boringssl_lib",
-    srcs = [
-        "//:boringssl_built_libs",
-    ],
-    hdrs = [
-        "//:boringssl_includes",
-    ],
-    linkstatic = True,
-    visibility = ["//visibility:private"],
 )
 
 libcurl_boringssl_cache_entries_common = {
@@ -85,17 +34,9 @@ libcurl_defines = [
     "CURL_STATICLIB",
 ]
 
-# Just using "@boringssl//:crypto" and "@boringssl//:ssl" as our 'deps'
-# as shown above gives doesn't work because the 'cmake' rule seems to
-# try and force boringssl to create BOTH static and shared libraries the
-# latter of which does not work on Windows. Our workaround is to create
-# our own "//:boringssl_lib" which only has the static libraries.
-# For additional information see comments above.
 cmake(
     name = "libcurl_boringssl_windows",
-    cache_entries = dict(libcurl_boringssl_cache_entries_common.items() + {
-        "OPENSSL_ROOT_DIR": "$$EXT_BUILD_DEPS$$/../../boringssl",
-    }.items()),
+    cache_entries = libcurl_boringssl_cache_entries_common,
     defines = libcurl_defines,
     lib_source = "//:all",
     linkopts = [
@@ -115,9 +56,13 @@ cmake(
             "libcurl.lib",
         ],
     }),
-    visibility = ["//visibility:private"],
+    # Just using "@boringssl//:crypto" and "@boringssl//:ssl" as our 'deps'
+    # as in linux and macos variant doesn't work because the 'cmake' rule seems to
+    # try and force boringssl to create BOTH static and shared libraries the
+    # latter of which does not work on Windows. Our workaround is to create
+    # our own "//:boringssl_lib" which only has the static libraries.
     deps = [
-        "//:boringssl_lib",
+        "@boringssl_with_bazel_rules_curl_build_file//:boringssl_lib",
     ],
 )
 
@@ -139,7 +84,6 @@ cmake(
             "libcurl.a",
         ],
     }),
-    visibility = ["//visibility:private"],
     deps = [
         "@boringssl//:crypto",
         "@boringssl//:ssl",

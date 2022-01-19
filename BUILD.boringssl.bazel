@@ -1,0 +1,30 @@
+# NOTE: cmake rule tries to build both shared and static libraries
+# even though the result library is static.
+# Because Windows shared libraries work a bit different
+# from how they work on Linux or MacOS (there's no such a thing as
+# dividing shared libraries into interface and implementation libs).
+# we build static libraries by ourselves and pass output (and includes)
+# as deps to the cmake rule.
+
+# Passes built static libs and required includes to other targets
+# that use it as a dependency.
+
+cc_library(
+    name = "boringssl_lib",
+    srcs = [
+        # Builds crypto and ssl static libs (.lib or .a).
+        # It will never build shared boringssl libraries even if dependant targets
+        # would ask for it.
+        # Doesn't output headers of those rules!!!
+        "@boringssl//:crypto",
+        "@boringssl//:ssl",
+    ],
+    hdrs = glob([
+        "src/include/openssl/*.h",
+    ]),
+    includes = [
+        "src/include",
+    ],
+    linkstatic = True,
+    visibility = ["@com_github_curl_curl//:__pkg__"],
+)
