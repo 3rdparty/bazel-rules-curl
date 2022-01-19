@@ -20,7 +20,7 @@ def deps(repo_mapping = {}):
     maybe(
         new_git_repository,
         name = "boringssl_with_bazel_rules_curl_build_file",
-        build_file = "@com_github_3rdparty_bazel_rules_curl//:BUILD.bazel",
+        build_file = "@com_github_3rdparty_bazel_rules_curl//:BUILD.boringssl.bazel",
         commit = "b9232f9e27e5668bc0414879dcdedb2a59ea75f2",
         remote = "https://boringssl.googlesource.com/boringssl",
         shallow_since = "1637714942 +0000",
