@@ -68,7 +68,12 @@ cmake(
 
 cmake(
     name = "libcurl_boringssl_linux_macos",
-    cache_entries = libcurl_boringssl_cache_entries_common,
+    cache_entries = dict(libcurl_boringssl_cache_entries_common.items() + {
+        # Disable linkage to an OpenLDAP library, since it's currently not
+        # being built by us.
+        "CURL_DISABLE_LDAP": "ON",
+        "CURL_DISABLE_LDAPS": "ON",
+    }.items()),
     defines = libcurl_defines,
     lib_source = "//:all",
     linkopts = [
