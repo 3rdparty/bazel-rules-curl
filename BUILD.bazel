@@ -28,6 +28,7 @@ libcurl_boringssl_cache_entries_common = {
     "CMAKE_USE_WOLFSSL": "FALSE",
     "CMAKE_USE_MBEDTLS": "FALSE",
     "CMAKE_USE_NSS": "FALSE",
+    "CMAKE_OBJECT_PATH_MAX": "512",
 }
 
 libcurl_defines = [
