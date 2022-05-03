@@ -16,7 +16,7 @@ libcurl_boringssl_cache_entries_common = {
     "BUILD_SHARED_LIBS": "OFF",
     "BUILD_TESTING": "OFF",
     "BUILD_CURL_EXE": "OFF",
-    "CMAKE_USE_OPENSSL": "TRUE",
+    "CURL_USE_OPENSSL": "TRUE",
     # NOTE: Disable unused dependencies so we won't have any linker issues.
     # At least on MacOS if libssh or libssh2 happens to be installed then
     # cmake will attempt to link against the library but Bazel will expect
