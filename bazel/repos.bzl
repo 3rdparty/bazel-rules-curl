@@ -28,7 +28,7 @@ def repos(external = True, repo_mapping = {}):
             git_repository,
             name = "com_github_3rdparty_bazel_rules_curl",
             remote = "https://github.com/3rdparty/bazel-rules-curl",
-            commit = "a9c0fba348072fbef245a44c511955c35500f364",
-            shallow_since = "1646329189 +0100",
+            commit = "413c386a05f228d40623f973f3bb5bde1833e238",
+            shallow_since = "1651606114 +0200",
             repo_mapping = repo_mapping,
         )
