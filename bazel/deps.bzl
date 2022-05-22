@@ -30,9 +30,9 @@ def deps(repo_mapping = {}):
     maybe(
         http_archive,
         name = "com_github_curl_curl",
-        url = "https://github.com/curl/curl/archive/refs/tags/curl-7_83_0.tar.gz",
-        sha256 = "9350985ab43591ecd04b087f9c9dad84b952c35c6012e2a08ae355ae797db988",
-        strip_prefix = "curl-curl-7_83_0",
+        url = "https://github.com/curl/curl/archive/refs/tags/curl-7_83_1.tar.gz",
+        sha256 = "903f89dee3be8c9749862b4f1ac9faae8fba49b1a00a7cbf06af6fce16494309",
+        strip_prefix = "curl-curl-7_83_1",
         build_file = "@com_github_3rdparty_bazel_rules_curl//:BUILD.bazel",
         repo_mapping = repo_mapping,
     )

@@ -93,14 +93,53 @@ cmake(
         "@boringssl//:crypto",
         "@boringssl//:ssl",
     ],
+    alwayslink = True,
 )
 
-alias(
-    name = "libcurl_boringssl",
-    actual = select({
-        "@bazel_tools//src/conditions:windows": "libcurl_boringssl_windows",
-        "//conditions:default": "libcurl_boringssl_linux_macos",
+#alias(
+#    name = "libcurl_boringssl_alias",
+#    actual = select({
+#        "@bazel_tools//src/conditions:windows": "libcurl_boringssl_windows",
+#        "//conditions:default": "libcurl_boringssl_linux_macos",
+#    }),
+#    visibility = ["//visibility:public"],
+#)
+
+cc_library(
+    name = "libcurl_boringssl_propagater",
+    # We don't want to just propagate the dependencies, because that will
+    # make the dependants think that we produce a shared curl library, which
+    # is not true.
+    implementation_deps = select({
+        "@bazel_tools//src/conditions:windows": ["libcurl_boringssl_windows"],
+        "//conditions:default": ["libcurl_boringssl_linux_macos"],
     }),
+    # Since we only build a static version of curl, we require this library to
+    # be linked statically.
+    linkstatic = True,
+    visibility = ["//visibility:public"],
+    # We are propagating BoringSSL though.
+    deps = [
+        "@boringssl//:crypto",
+        "@boringssl//:ssl",
+    ],
+)
+
+filegroup(
+    name = "libcurl_boringssl_filter",
+    srcs = [":libcurl_boringssl_propagater"],
+    output_group = "archive",
+    visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "libcurl_boringssl",
+    srcs = [":libcurl_boringssl_filter"],
+    # Propagate curl headers.
+    hdrs = glob(["include/curl/*.h"]),
+    includes = [
+        "include/",
+    ],
     visibility = ["//visibility:public"],
 )
 
