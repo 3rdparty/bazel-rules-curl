@@ -34,9 +34,14 @@ libcurl_defines = [
     "CURL_STATICLIB",
 ]
 
+libcurl_copts = [
+    "-fPIC",
+]
+
 cmake(
     name = "libcurl_boringssl_windows",
     cache_entries = libcurl_boringssl_cache_entries_common,
+    copts = libcurl_copts,
     defines = libcurl_defines,
     lib_source = "//:all",
     linkopts = [
@@ -74,6 +79,7 @@ cmake(
         "CURL_DISABLE_LDAP": "ON",
         "CURL_DISABLE_LDAPS": "ON",
     }.items()),
+    copts = libcurl_copts,
     defines = libcurl_defines,
     lib_source = "//:all",
     linkopts = [
