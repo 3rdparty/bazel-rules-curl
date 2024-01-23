@@ -11,9 +11,12 @@ def deps(repo_mapping = {}):
     maybe(
         git_repository,
         name = "boringssl",
-        commit = "b9232f9e27e5668bc0414879dcdedb2a59ea75f2",
+        # BoringSSL doesn't usually cut releases, so we use a commit
+        # from the 'main-with-bazel' branch, that has bazel rules for
+        # it's dependencies.
+        commit = "652d66d1feb8ba612e776e03182fa1c8f716d265",
         remote = "https://boringssl.googlesource.com/boringssl",
-        shallow_since = "1637714942 +0000",
+        shallow_since = "1705953338 +0000",
         repo_mapping = repo_mapping,
     )
 
@@ -21,9 +24,9 @@ def deps(repo_mapping = {}):
         new_git_repository,
         name = "boringssl_with_bazel_rules_curl_build_file",
         build_file = "@com_github_3rdparty_bazel_rules_curl//:BUILD.boringssl.bazel",
-        commit = "b9232f9e27e5668bc0414879dcdedb2a59ea75f2",
+        commit = "652d66d1feb8ba612e776e03182fa1c8f716d265",
         remote = "https://boringssl.googlesource.com/boringssl",
-        shallow_since = "1637714942 +0000",
+        shallow_since = "1705953338 +0000",
         repo_mapping = repo_mapping,
     )
 
